@@ -1,0 +1,120 @@
+
+> use sigma
+switched to db sigma
+//1. Create a collection named orders.
+> db.createCollection('orders')
+{ "ok" : 1 }
+
+> var orders = db.orders
+
+> orders.find()
+
+//2. Insert at least 3 documents that represent an order
+> orders.insert({ orderDate: new ISODate('2016-05-30'), orderTotal: 500, lineItems: [{unitPrice: 3}, {quantity: 3000}, {productName: "Forks"}]});
+WriteResult({ "nInserted" : 1 })
+
+> orders.insert({ orderDate: new ISODate('2016-10-30'), orderTotal:100, lineItems: [{unitPrice:6}, {quantity: 400}, {productName: "Spoons"}]});
+WriteResult({ "nInserted" : 1 })
+
+> orders.insert({ orderDate: new ISODate('2016-09-20'), orderTotal:20, lineItems: [{unitPrice:2}, {quantity: 50}, {productName: "Knives"}]});
+WriteResult({ "nInserted" : 1 })
+
+//3. Find a single order document, any order document.
+> orders.find({ orderDate: new ISODate('2016-05-30')});
+{ "_id" : ObjectId("583f523928c493f2815cb404"), "orderDate" : ISODate("2016-05-30T00:00:00Z"), "orderTotal" : 500, "lineItems" : [ { "unitPrice" : 3 }, { "quantity" : 3000 }, { "productName" : "Forks" } ] }
+
+//4. Find all orders and make them look pretty.
+> orders.find().pretty()
+{
+	"_id" : ObjectId("583f523928c493f2815cb404"),
+	"orderDate" : ISODate("2016-05-30T00:00:00Z"),
+	"orderTotal" : 500,
+	"lineItems" : [
+		{
+			"unitPrice" : 3
+		},
+		{
+			"quantity" : 3000
+		},
+		{
+			"productName" : "Forks"
+		}
+	]
+}
+{
+	"_id" : ObjectId("583f528b28c493f2815cb405"),
+	"orderDate" : ISODate("2016-10-30T00:00:00Z"),
+	"orderTotal" : 100,
+	"lineItems" : [
+		{
+			"unitPrice" : 6
+		},
+		{
+			"quantity" : 400
+		},
+		{
+			"productName" : "Spoons"
+		}
+	]
+}
+{
+	"_id" : ObjectId("583f52e228c493f2815cb406"),
+	"orderDate" : ISODate("2016-09-20T00:00:00Z"),
+	"orderTotal" : 20,
+	"lineItems" : [
+		{
+			"unitPrice" : 2
+		},
+		{
+			"quantity" : 50
+		},
+		{
+			"productName" : "Knives"
+		}
+	]
+}
+
+//5. Find all orders with an orderDate that is prior to 1/1/2016.
+> orders.find({ orderDate:{$lt: new ISODate('2016-01-01')}});
+
+//6. Find all orders with an orderDate that is after 1/1/2016.
+> orders.find({ orderDate:{$gt: new ISODate('2016-01-01')}});
+{ "_id" : ObjectId("583f523928c493f2815cb404"), "orderDate" : ISODate("2016-05-30T00:00:00Z"), "orderTotal" : 500, "lineItems" : [ { "unitPrice" : 3 }, { "quantity" : 3000 }, { "productName" : "Forks" } ] }
+{ "_id" : ObjectId("583f528b28c493f2815cb405"), "orderDate" : ISODate("2016-10-30T00:00:00Z"), "orderTotal" : 100, "lineItems" : [ { "unitPrice" : 6 }, { "quantity" : 400 }, { "productName" : "Spoons" } ] }
+{ "_id" : ObjectId("583f52e228c493f2815cb406"), "orderDate" : ISODate("2016-09-20T00:00:00Z"), "orderTotal" : 20, "lineItems" : [ { "unitPrice" : 2 }, { "quantity" : 50 }, { "productName" : "Knives" } ] }
+
+//7. Find orders with lineItems that have a quantity that is less than 50, but greater than 5.
+> orders.find({lineItems: {unitPrice:{$lt: 50}, unitPrice:{$gt: 5}}});
+
+//8. Update one of your line items to 42.99.
+> orders.update({orderTotal:20}, {$set: {lineItems:{unitPrice:42.99}}})
+WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
+>
+//9. Remove one of your orders.
+> orders.remove({ "_id" : ObjectId("583f523928c493f2815cb404")})
+WriteResult({ "nRemoved" : 1 })
+> orders.find().pretty()
+{
+	"_id" : ObjectId("583f528b28c493f2815cb405"),
+	"orderDate" : ISODate("2016-10-30T00:00:00Z"),
+	"orderTotal" : 100,
+	"lineItems" : [
+		{
+			"unitPrice" : 6
+		},
+		{
+			"quantity" : 400
+		},
+		{
+			"productName" : "Spoons"
+		}
+	]
+}
+{
+	"_id" : ObjectId("583f52e228c493f2815cb406"),
+	"orderDate" : ISODate("2016-09-20T00:00:00Z"),
+	"orderTotal" : 20,
+	"lineItems" : {
+		"unitPrice" : 42.99
+	}
+}
